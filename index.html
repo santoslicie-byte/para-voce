@@ -8,119 +8,756 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --bg-deep: #0b0e1a; --bg-midnight: #141930; --bg-twilight: #1d1b38; --accent-gold: #f6d388; --accent-soft: #a799ff; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at 50% 20%, var(--bg-twilight) 0%, var(--bg-midnight) 45%, var(--bg-deep) 100%); color: #e2e8f0; min-height: 100vh; overflow-x: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .font-serif-soft { font-family: 'Cormorant Garamond', serif; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.15; transform: scale(0.9); } 50% { opacity: 0.75; transform: scale(1.15); } }
-        .star { position: absolute; background-color: #fff; border-radius: 50%; pointer-events: none; animation: twinkle var(--duration, 5s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
-        @keyframes floatJar { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-6px) rotate(0.6deg); } }
-        .jar-container { animation: floatJar 6s ease-in-out infinite; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-        .jar-container:active { transform: scale(0.96); }
-        @keyframes glowPulse { 0%, 100% { filter: drop-shadow(0 0 4px rgba(246, 211, 136, 0.4)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 10px rgba(246, 211, 136, 0.85)); opacity: 1; } }
-        .jar-note-glow { animation: glowPulse var(--pulse-dur, 4s) ease-in-out infinite; animation-delay: var(--pulse-del, 0s); }
-        .note-modal-backdrop { opacity: 0; pointer-events: none; transition: opacity 0.6s ease; backdrop-filter: blur(8px); }
-        .note-modal-backdrop.active { opacity: 1; pointer-events: auto; }
-        .note-card { transform: translateY(24px) scale(0.94); opacity: 0; transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1); background: linear-gradient(180deg, #e8d5b5 0%, #f7ebd2 8%, #fdf6e7 50%, #f7ebd2 92%, #e8d5b5 100%); color: #3a2a1d; border-left: 1px solid rgba(166,124,82,.25); border-right: 1px solid rgba(166,124,82,.25); box-shadow: 0 25px 50px -12px rgba(0,0,0,.65), 0 0 35px rgba(246,211,136,.18), inset 0 0 24px rgba(184,142,92,.16); }
-        .note-card::before, .note-card::after { content:''; position:absolute; left:-10px; right:-10px; height:20px; border-radius:9999px; background:linear-gradient(180deg,#d8be96 0%,#f4e4c8 45%,#c4a478 100%); box-shadow:0 5px 12px rgba(45,28,12,.28), inset 0 1px 2px rgba(255,255,255,.7); border:1px solid rgba(150,110,68,.35); pointer-events:none; }
-        .note-card::before { top:-9px; } .note-card::after { bottom:-9px; }
-        .note-modal-backdrop.active .note-card { transform: translateY(0) scale(1); opacity: 1; }
-        @keyframes breatheCycle { 0%,100% { transform:scale(1); background-color:rgba(167,153,255,.12); box-shadow:0 0 20px rgba(167,153,255,.1); } 40%,55% { transform:scale(1.45); background-color:rgba(246,211,136,.22); box-shadow:0 0 45px rgba(246,211,136,.25); } }
-        .breathing-circle { animation: breatheCycle 10s ease-in-out infinite; }
-        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:10px; }
+        :root {
+            --bg-deep: #0b0e1a;
+            --bg-midnight: #141930;
+            --bg-twilight: #1d1b38;
+            --accent-gold: #f6d388;
+            --accent-soft: #a799ff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 20%, var(--bg-twilight) 0%, var(--bg-midnight) 45%, var(--bg-deep) 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button, [role="button"] {
+            cursor: pointer;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-serif-soft {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Estrelas no fundo */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; transform: scale(0.9); }
+            50% { opacity: 0.75; transform: scale(1.15); }
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: twinkle var(--duration, 5s) ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
+        }
+
+        /* Flutuação suave do pote */
+        @keyframes floatJar {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(0.6deg); }
+        }
+
+        .jar-container {
+            animation: floatJar 6s ease-in-out infinite;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .jar-container:active {
+            transform: scale(0.96);
+        }
+
+        /* Brilho dos papéis/estrelas dentro do pote */
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(246, 211, 136, 0.4)); opacity: 0.8; }
+            50% { filter: drop-shadow(0 0 10px rgba(246, 211, 136, 0.85)); opacity: 1; }
+        }
+
+        .jar-note-glow {
+            animation: glowPulse var(--pulse-dur, 4s) ease-in-out infinite;
+            animation-delay: var(--pulse-del, 0s);
+        }
+
+        /* Animação da carta abrindo */
+        .note-modal-backdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .note-modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .note-card {
+            transform: translateY(24px) scale(0.94);
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            background: linear-gradient(180deg, #e8d5b5 0%, #f7ebd2 8%, #fdf6e7 50%, #f7ebd2 92%, #e8d5b5 100%);
+            color: #3a2a1d;
+            border-left: 1px solid rgba(166, 124, 82, 0.25);
+            border-right: 1px solid rgba(166, 124, 82, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 35px rgba(246, 211, 136, 0.18), inset 0 0 24px rgba(184, 142, 92, 0.16);
+        }
+
+        .note-card::before,
+        .note-card::after {
+            content: '';
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            height: 20px;
+            border-radius: 9999px;
+            background: linear-gradient(180deg, #d8be96 0%, #f4e4c8 45%, #c4a478 100%);
+            box-shadow: 0 5px 12px rgba(45, 28, 12, 0.28), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(150, 110, 68, 0.35);
+            pointer-events: none;
+        }
+
+        .note-card::before {
+            top: -9px;
+        }
+
+        .note-card::after {
+            bottom: -9px;
+        }
+
+        .note-modal-backdrop.active .note-card {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Animação de respiração guiada */
+        @keyframes breatheCycle {
+            0%, 100% { transform: scale(1); background-color: rgba(167, 153, 255, 0.12); box-shadow: 0 0 20px rgba(167, 153, 255, 0.1); }
+            40% { transform: scale(1.45); background-color: rgba(246, 211, 136, 0.22); box-shadow: 0 0 45px rgba(246, 211, 136, 0.25); }
+            55% { transform: scale(1.45); background-color: rgba(246, 211, 136, 0.22); box-shadow: 0 0 45px rgba(246, 211, 136, 0.25); }
+        }
+
+        .breathing-circle {
+            animation: breatheCycle 10s ease-in-out infinite;
+        }
+
+        /* Scrollbar discreta */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="relative flex flex-col justify-between items-center px-5 py-6 sm:py-8">
+
+    <!-- Camada de Estrelas de Fundo -->
     <div id="starfield" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Barra Superior Discreta -->
     <header class="relative z-10 w-full max-w-md flex items-center justify-between">
-        <button id="btnBreathe" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 transition-all active:scale-95"><span class="w-2 h-2 rounded-full bg-indigo-300 animate-pulse"></span><span>Respirar fundo</span></button>
+        <button id="btnBreathe" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 transition-all active:scale-95">
+            <span class="w-2 h-2 rounded-full bg-indigo-300 animate-pulse"></span>
+            <span>Respirar fundo</span>
+        </button>
+
         <div class="flex items-center gap-2">
-            <button id="btnOpenAdd" title="Adicionar novo bilhetinho" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all active:scale-95"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></button>
+            <!-- Botão Adicionar Bilhete -->
+            <button id="btnOpenAdd" title="Adicionar novo bilhetinho" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+            </button>
+
+            <!-- Botão Som Ambiente / Caixa de Música -->
             <button id="btnAudio" title="Som suave de caixa de música" class="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 transition-all active:scale-95">
-                <svg id="iconAudioOff" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
-                <svg id="iconAudioOn" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-200 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+                <svg id="iconAudioOff" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                </svg>
+                <svg id="iconAudioOn" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-200 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                </svg>
                 <span id="audioLabel">Som suave</span>
             </button>
         </div>
     </header>
 
+    <!-- Conteúdo Principal -->
     <main class="relative z-10 flex flex-col items-center text-center max-w-md w-full my-auto py-4">
         <p class="text-xs uppercase tracking-[0.25em] text-indigo-300/80 mb-2">Para acalmar o seu coração</p>
-        <h1 class="font-serif-soft text-3xl sm:text-4xl font-semibold text-amber-100/95 tracking-wide mb-2">Para o Amor da Minha Vida</h1>
-        <p class="text-sm text-slate-300/80 font-light max-w-xs leading-relaxed mb-6">Sempre que a mente acelerar e o sono demorar a chegar, pegue um bilhetinho aqui dentro e lembre do quanto eu te amo.</p>
+        <h1 class="font-serif-soft text-3xl sm:text-4xl font-semibold text-amber-100/95 tracking-wide mb-2">
+            Para o Amor da Minha Vida
+        </h1>
+        <p class="text-sm text-slate-300/80 font-light max-w-xs leading-relaxed mb-6">
+            Sempre que a mente acelerar e o sono demorar a chegar, pegue um bilhetinho aqui dentro e lembre do quanto eu te amo.
+        </p>
+
+        <!-- Ilustração Interativa do Pote de Vidro (SVG) -->
         <div id="jarTrigger" role="button" tabindex="0" aria-label="Abrir um bilhetinho do pote" class="jar-container cursor-pointer relative w-56 h-64 sm:w-64 sm:h-72 flex items-center justify-center group my-2">
-            <div class="absolute w-44 h-44 rounded-full bg-amber-200/10 blur-2xl group-hover:bg-amber-200/20 transition-all duration-700"></div>
-            <svg viewBox="0 0 220 260" class="w-full h-full drop-shadow-2xl overflow-visible">
+            <!-- Aura suave atrás do pote -->
+            <div class="absolute w-44 h-44 rounded-full bg-amber-200/10 blur-2xl group-hover:bg-amber-200/20 transition-all duration-700 pointer-events-none"></div>
+
+            <svg viewBox="0 0 220 260" class="w-full h-full drop-shadow-2xl overflow-visible pointer-events-none">
                 <defs>
-                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,.22)"/><stop offset="40%" stop-color="rgba(255,255,255,.05)"/><stop offset="100%" stop-color="rgba(167,153,255,.16)"/></linearGradient>
-                    <linearGradient id="corkGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8c6239"/><stop offset="50%" stop-color="#b58352"/><stop offset="100%" stop-color="#734d29"/></linearGradient>
-                    <radialGradient id="innerWarmth" cx="50%" cy="65%" r="50%"><stop offset="0%" stop-color="rgba(246,211,136,.25)"/><stop offset="100%" stop-color="rgba(246,211,136,0)"/></radialGradient>
+                    <!-- Gradiente do vidro -->
+                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(255, 255, 255, 0.22)" />
+                        <stop offset="40%" stop-color="rgba(255, 255, 255, 0.05)" />
+                        <stop offset="100%" stop-color="rgba(167, 153, 255, 0.16)" />
+                    </linearGradient>
+                    <!-- Gradiente da rolha/tampa -->
+                    <linearGradient id="corkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#8c6239" />
+                        <stop offset="50%" stop-color="#b58352" />
+                        <stop offset="100%" stop-color="#734d29" />
+                    </linearGradient>
+                    <!-- Gradiente do brilho interno -->
+                    <radialGradient id="innerWarmth" cx="50%" cy="65%" r="50%">
+                        <stop offset="0%" stop-color="rgba(246, 211, 136, 0.25)" />
+                        <stop offset="100%" stop-color="rgba(246, 211, 136, 0)" />
+                    </radialGradient>
                 </defs>
-                <path d="M76 22L144 22L139 44L81 44Z" fill="url(#corkGrad)"/><ellipse cx="110" cy="22" rx="34" ry="4" fill="#c69667"/>
-                <rect x="70" y="42" width="80" height="10" rx="5" fill="rgba(255,255,255,.28)" stroke="rgba(255,255,255,.4)" stroke-width="1"/>
-                <path d="M75 52C50 62 42 82 42 115V215C42 235 56 244 80 244H140C164 244 178 235 178 215V115C178 82 170 62 145 52Z" fill="url(#glassGrad)" stroke="rgba(255,255,255,.32)" stroke-width="1.8"/>
-                <ellipse cx="110" cy="175" rx="58" ry="55" fill="url(#innerWarmth)"/>
+
+                <!-- Rolha de cortiça -->
+                <path d="M 76 22 L 144 22 L 139 44 L 81 44 Z" fill="url(#corkGrad)" rx="4" />
+                <ellipse cx="110" cy="22" rx="34" ry="4" fill="#c69667" />
+
+                <!-- Boca do vidro -->
+                <rect x="70" y="42" width="80" height="10" rx="5" fill="rgba(255,255,255,0.28)" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+
+                <!-- Corpo do Pote -->
+                <path d="M 75 52 C 50 62, 42 82, 42 115 L 42 215 C 42 235, 56 244, 80 244 L 140 244 C 164 244, 178 235, 178 215 L 178 115 C 178 82, 170 62, 145 52 Z" 
+                      fill="url(#glassGrad)" stroke="rgba(255, 255, 255, 0.32)" stroke-width="1.8" />
+
+                <!-- Calor interno -->
+                <ellipse cx="110" cy="175" rx="58" ry="55" fill="url(#innerWarmth)" />
+
+                <!-- Papéis enrolados & Estrelinhas luminosas dentro do pote -->
                 <g id="jarContents">
-                    <g transform="translate(65 195) rotate(-18)" class="jar-note-glow" style="--pulse-dur:3.8s;--pulse-del:.2s"><rect x="3" y="0" width="32" height="12" rx="2" fill="#f3dfb9"/><ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#dfbe8a"/><rect x="16" y="-.5" width="5" height="13" rx="1" fill="#e5989b"/></g>
-                    <g transform="translate(110 202) rotate(12)" class="jar-note-glow" style="--pulse-dur:4.5s;--pulse-del:1s"><rect x="3" y="0" width="34" height="12" rx="2" fill="#f7e7c6"/><ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#e2c391"/><rect x="17" y="-.5" width="5" height="13" rx="1" fill="#b8a9ff"/></g>
-                    <g transform="translate(84 177) rotate(5)" class="jar-note-glow" style="--pulse-dur:5s;--pulse-del:.5s"><rect x="3" y="0" width="36" height="12" rx="2" fill="#efd7ac"/><ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#d8b47c"/><rect x="18" y="-.5" width="5" height="13" rx="1" fill="#f28482"/></g>
-                    <g transform="translate(58 164) rotate(-32)" class="jar-note-glow" style="--pulse-dur:4.2s;--pulse-del:1.5s"><rect x="3" y="0" width="30" height="11" rx="2" fill="#f8e9cb"/><ellipse cx="3" cy="5.5" rx="2.2" ry="5.5" fill="#e2c391"/><rect x="15" y="-.5" width="4.5" height="12" rx="1" fill="#e09f7d"/></g>
-                    <g transform="translate(120 169) rotate(-22)" class="jar-note-glow" style="--pulse-dur:3.6s;--pulse-del:.8s"><rect x="3" y="0" width="32" height="11.5" rx="2" fill="#f4dfc0"/><ellipse cx="3" cy="5.75" rx="2.3" ry="5.75" fill="#dfbe8a"/><rect x="16" y="-.5" width="4.8" height="12.5" rx="1" fill="#e5989b"/></g>
-                    <g transform="translate(90 151) rotate(24)" class="jar-note-glow" style="--pulse-dur:4.8s;--pulse-del:.3s"><rect x="3" y="0" width="30" height="11" rx="2" fill="#f7e7c6"/><ellipse cx="3" cy="5.5" rx="2.2" ry="5.5" fill="#e2c391"/><rect x="15" y="-.5" width="4.5" height="12" rx="1" fill="#b8a9ff"/></g>
-                    <circle cx="82" cy="122" r="2.5" fill="#fde68a" class="jar-note-glow"/><circle cx="135" cy="134" r="3" fill="#fde68a" class="jar-note-glow"/><circle cx="108" cy="105" r="2" fill="#e9d5ff" class="jar-note-glow"/><circle cx="75" cy="142" r="2" fill="#fde68a" class="jar-note-glow"/>
+                    <!-- Pergaminho 1 -->
+                    <g transform="translate(65, 195) rotate(-18)" class="jar-note-glow" style="--pulse-dur: 3.8s; --pulse-del: 0.2s;">
+                        <rect x="3" y="0" width="32" height="12" rx="2" fill="#f3dfb9" stroke="#cfa972" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#dfbe8a" stroke="#b88e56" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="1" ry="3" fill="#8c6239" />
+                        <ellipse cx="35" cy="6" rx="2.5" ry="6" fill="#f9ebd0" stroke="#cfa972" stroke-width="0.6" />
+                        <rect x="16" y="-0.5" width="5" height="13" rx="1" fill="#e5989b" />
+                        <path d="M 18.5 3 Q 13 -1 14 4 Q 16 6 18.5 5 Q 21 6 23 4 Q 24 -1 18.5 3 Z" fill="#f28482" />
+                    </g>
+                    <!-- Pergaminho 2 -->
+                    <g transform="translate(110, 202) rotate(12)" class="jar-note-glow" style="--pulse-dur: 4.5s; --pulse-del: 1s;">
+                        <rect x="3" y="0" width="34" height="12" rx="2" fill="#f7e7c6" stroke="#cfa972" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#e2c391" stroke="#b88e56" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="1" ry="3" fill="#8c6239" />
+                        <ellipse cx="37" cy="6" rx="2.5" ry="6" fill="#fcf2de" stroke="#cfa972" stroke-width="0.6" />
+                        <rect x="17" y="-0.5" width="5" height="13" rx="1" fill="#b8a9ff" />
+                        <path d="M 19.5 3 Q 14 -1 15 4 Q 17 6 19.5 5 Q 22 6 24 4 Q 25 -1 19.5 3 Z" fill="#a799ff" />
+                    </g>
+                    <!-- Pergaminho 3 -->
+                    <g transform="translate(84, 177) rotate(5)" class="jar-note-glow" style="--pulse-dur: 5s; --pulse-del: 0.5s;">
+                        <rect x="3" y="0" width="36" height="12" rx="2" fill="#efd7ac" stroke="#c59c63" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="2.5" ry="6" fill="#d8b47c" stroke="#a67c46" stroke-width="0.6" />
+                        <ellipse cx="3" cy="6" rx="1" ry="3" fill="#7c532c" />
+                        <ellipse cx="39" cy="6" rx="2.5" ry="6" fill="#f8e8c8" stroke="#c59c63" stroke-width="0.6" />
+                        <rect x="18" y="-0.5" width="5" height="13" rx="1" fill="#f28482" />
+                        <path d="M 20.5 3 Q 15 -1 16 4 Q 18 6 20.5 5 Q 23 6 25 4 Q 26 -1 20.5 3 Z" fill="#ff9b99" />
+                    </g>
+                    <!-- Pergaminho 4 -->
+                    <g transform="translate(58, 164) rotate(-32)" class="jar-note-glow" style="--pulse-dur: 4.2s; --pulse-del: 1.5s;">
+                        <rect x="3" y="0" width="30" height="11" rx="2" fill="#f8e9cb" stroke="#cfa972" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.5" rx="2.2" ry="5.5" fill="#e2c391" stroke="#b88e56" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.5" rx="0.9" ry="2.6" fill="#8c6239" />
+                        <ellipse cx="33" cy="5.5" rx="2.2" ry="5.5" fill="#fff5e0" stroke="#cfa972" stroke-width="0.6" />
+                        <rect x="15" y="-0.5" width="4.5" height="12" rx="1" fill="#e09f7d" />
+                    </g>
+                    <!-- Pergaminho 5 -->
+                    <g transform="translate(120, 169) rotate(-22)" class="jar-note-glow" style="--pulse-dur: 3.6s; --pulse-del: 0.8s;">
+                        <rect x="3" y="0" width="32" height="11.5" rx="2" fill="#f4dfc0" stroke="#cfa972" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.75" rx="2.3" ry="5.75" fill="#dfbe8a" stroke="#b88e56" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.75" rx="1" ry="2.8" fill="#8c6239" />
+                        <ellipse cx="35" cy="5.75" rx="2.3" ry="5.75" fill="#faedd4" stroke="#cfa972" stroke-width="0.6" />
+                        <rect x="16" y="-0.5" width="4.8" height="12.5" rx="1" fill="#e5989b" />
+                        <path d="M 18.4 3 Q 13.5 -0.8 14.5 3.8 Q 16.5 5.5 18.4 4.8 Q 20.3 5.5 22.3 3.8 Q 23.3 -0.8 18.4 3 Z" fill="#f28482" />
+                    </g>
+                    <!-- Pergaminho 6 -->
+                    <g transform="translate(90, 151) rotate(24)" class="jar-note-glow" style="--pulse-dur: 4.8s; --pulse-del: 0.3s;">
+                        <rect x="3" y="0" width="30" height="11" rx="2" fill="#f7e7c6" stroke="#cfa972" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.5" rx="2.2" ry="5.5" fill="#e2c391" stroke="#b88e56" stroke-width="0.6" />
+                        <ellipse cx="3" cy="5.5" rx="0.9" ry="2.6" fill="#8c6239" />
+                        <ellipse cx="33" cy="5.5" rx="2.2" ry="5.5" fill="#fcf2de" stroke="#cfa972" stroke-width="0.6" />
+                        <rect x="15" y="-0.5" width="4.5" height="12" rx="1" fill="#b8a9ff" />
+                    </g>
+
+                    <!-- Pequenas luzes/vagalumes flutuando no pote -->
+                    <circle cx="82" cy="122" r="2.5" fill="#fde68a" class="jar-note-glow" style="--pulse-dur: 3s; --pulse-del: 0s;" />
+                    <circle cx="135" cy="134" r="3" fill="#fde68a" class="jar-note-glow" style="--pulse-dur: 4.1s; --pulse-del: 1.2s;" />
+                    <circle cx="108" cy="105" r="2" fill="#e9d5ff" class="jar-note-glow" style="--pulse-dur: 3.5s; --pulse-del: 0.7s;" />
+                    <circle cx="75" cy="142" r="2" fill="#fde68a" class="jar-note-glow" style="--pulse-dur: 4.4s; --pulse-del: 1.9s;" />
                 </g>
-                <path d="M56 85C54 120 54 175 57 215" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3.5" stroke-linecap="round"/><path d="M65 76C64 85 64 92 64 98" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M73 53Q110 61 147 53" fill="none" stroke="#e5989b" stroke-width="3.2" stroke-linecap="round"/>
-                <g transform="translate(110 57)"><path d="M-2 2Q-10 14-14 21" fill="none" stroke="#e5989b" stroke-width="2.8" stroke-linecap="round"/><path d="M2 2Q10 14 14 21" fill="none" stroke="#e5989b" stroke-width="2.8" stroke-linecap="round"/><path d="M0 0C-11-11-22-4-17 5C-13 11-4 5 0 0Z" fill="#f28482"/><path d="M0 0C11-11 22-4 17 5C13 11 4 5 0 0Z" fill="#f28482"/><rect x="-3.5" y="-3" width="7" height="6" rx="2.5" fill="#ffb4a2"/></g>
-                <g transform="translate(131 56) rotate(14)"><rect x="0" y="0" width="28" height="16" rx="3" fill="#faedcd" stroke="#d4a373"/><text x="16" y="11" text-anchor="middle" font-size="7" fill="#5c4033" font-family="serif">p/ você</text></g>
+
+                <!-- Reflexo vertical no vidro (dá profundidade) -->
+                <path d="M 56 85 C 54 120, 54 175, 57 215" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="3.5" stroke-linecap="round" />
+                <path d="M 65 76 C 64 85, 64 92, 64 98" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2.5" stroke-linecap="round" />
+
+                <!-- Fita e Laço delicado amarrado no gargalo -->
+                <path d="M 73 53 Q 110 61 147 53" fill="none" stroke="#e5989b" stroke-width="3.2" stroke-linecap="round" />
+                
+                <!-- Laço centralizado no gargalo -->
+                <g transform="translate(110, 57)">
+                    <!-- Pontas soltas da fita -->
+                    <path d="M -2 2 Q -10 14 -14 21" fill="none" stroke="#e5989b" stroke-width="2.8" stroke-linecap="round" />
+                    <path d="M 2 2 Q 10 14 14 21" fill="none" stroke="#e5989b" stroke-width="2.8" stroke-linecap="round" />
+                    <!-- Alça esquerda do laço -->
+                    <path d="M 0 0 C -11 -11, -22 -4, -17 5 C -13 11, -4 5, 0 0 Z" fill="#f28482" stroke="#d66866" stroke-width="0.8" />
+                    <!-- Alça direita do laço -->
+                    <path d="M 0 0 C 11 -11, 22 -4, 17 5 C 13 11, 4 5, 0 0 Z" fill="#f28482" stroke="#d66866" stroke-width="0.8" />
+                    <!-- Nó central -->
+                    <rect x="-3.5" y="-3" width="7" height="6" rx="2.5" fill="#ffb4a2" stroke="#d66866" stroke-width="0.8" />
+                </g>
+
+                <!-- Etiqueta amarrada no gargalo -->
+                <g transform="translate(131, 56) rotate(14)">
+                    <rect x="0" y="0" width="28" height="16" rx="3" fill="#faedcd" stroke="#d4a373" stroke-width="1" />
+                    <circle cx="4" cy="8" r="1.5" fill="#8c6239" />
+                    <text x="16" y="11" text-anchor="middle" font-size="7" fill="#5c4033" font-family="serif">p/ você</text>
+                </g>
             </svg>
         </div>
-        <button id="btnOpenNote" class="mt-4 px-7 py-3.5 rounded-full bg-gradient-to-r from-amber-200/90 to-amber-100/90 hover:from-amber-200 hover:to-white text-slate-900 font-medium text-sm shadow-lg shadow-amber-200/10 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95">Abrir um bilhetinho</button>
+
+        <!-- Botão Principal -->
+        <button id="btnOpenNote" class="mt-4 px-7 py-3.5 rounded-full bg-gradient-to-r from-amber-200/90 to-amber-100/90 hover:from-amber-200 hover:to-white text-slate-900 font-medium text-sm shadow-lg shadow-amber-200/10 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2">
+            <span>Abrir um bilhetinho</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+        </button>
     </main>
-    <footer class="relative z-10 w-full max-w-md text-center pb-2"><p id="counterText" class="text-xs sm:text-sm text-slate-400/90 font-light">Toque no pote quando precisar de um abraço em forma de palavras.</p></footer>
 
-    <div id="noteModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/75 flex items-center justify-center p-6"><div class="note-card relative w-full max-w-sm rounded-xl px-7 py-9 sm:px-8 sm:py-10 text-center"><p class="text-[11px] uppercase tracking-[0.22em] text-amber-900/65 font-medium mb-4" id="noteTag">Lembrete para você</p><p id="noteText" class="font-serif-soft text-2xl sm:text-[26px] leading-relaxed text-[#2f2116] font-medium mb-7">Você já fez tudo o que podia até aqui. Agora, o seu único trabalho é descansar.</p><p class="text-xs text-amber-950/60 italic mb-6">Com todo o meu amor e orgulho ♥</p><div class="flex flex-col sm:flex-row gap-2.5 justify-center"><button id="btnAnotherNote" class="px-5 py-2.5 rounded-full bg-[#3a2a1d] hover:bg-[#4d3827] text-amber-50 text-xs font-medium transition-all active:scale-95">Pegar outro pergaminho</button><button id="btnCloseNote" class="px-5 py-2.5 rounded-full bg-amber-900/10 hover:bg-amber-900/15 text-[#3a2a1d] text-xs font-medium transition-all active:scale-95">Guardar no coração</button></div></div></div>
+    <!-- Rodapé com Contador Carinhoso -->
+    <footer class="relative z-10 w-full max-w-md text-center pb-2">
+        <p id="counterText" class="text-xs sm:text-sm text-slate-400/90 font-light">
+            Toque no pote quando precisar de um abraço em forma de palavras.
+        </p>
+    </footer>
 
-    <div id="breatheModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/85 flex flex-col items-center justify-center p-6 text-center"><div class="max-w-xs w-full flex flex-col items-center"><p class="text-xs uppercase tracking-[0.25em] text-indigo-300/70 mb-10">Desacelere um pouquinho</p><div class="relative w-48 h-48 flex items-center justify-center mb-10"><div class="breathing-circle w-32 h-32 rounded-full border border-amber-200/30 flex items-center justify-center"></div><span id="breatheInstruction" class="absolute font-serif-soft text-2xl text-amber-100 tracking-wide">Inspire...</span></div><p class="text-xs text-slate-400 leading-relaxed mb-8">Acompanhe o círculo. Solte os ombros, destrave o maxilar e deixe o ar sair devagar.</p><button id="btnCloseBreathe" class="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-xs text-slate-200">Voltar para o pote</button></div></div>
+    <!-- ========================================== -->
+    <!-- MODAL 1: CARTA ABERTA (PERGAMINHO)         -->
+    <!-- ========================================== -->
+    <div id="noteModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/75 flex items-center justify-center p-6">
+        <div class="note-card relative w-full max-w-sm rounded-xl px-7 py-9 sm:px-8 sm:py-10 text-center">
+            <!-- Fita e lacre decorativo no topo do pergaminho desenrolado -->
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <span class="h-[1.5px] w-10 bg-gradient-to-r from-transparent to-[#d66866]/60"></span>
+                <svg viewBox="0 0 36 22" class="w-8 h-5 overflow-visible drop-shadow-sm">
+                    <path d="M 18 11 Q 11 19 8 22" fill="none" stroke="#d66866" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 18 11 Q 25 19 28 22" fill="none" stroke="#d66866" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 18 11 C 9 2, 1 7, 5 14 C 8 18, 15 14, 18 11 Z" fill="#e5989b" stroke="#c85a58" stroke-width="0.8" />
+                    <path d="M 18 11 C 27 2, 35 7, 31 14 C 28 18, 21 14, 18 11 Z" fill="#e5989b" stroke="#c85a58" stroke-width="0.8" />
+                    <rect x="15" y="8.5" width="6" height="5" rx="2" fill="#f28482" stroke="#c85a58" stroke-width="0.8" />
+                </svg>
+                <span class="h-[1.5px] w-10 bg-gradient-to-l from-transparent to-[#d66866]/60"></span>
+            </div>
+            
+            <p class="text-[11px] uppercase tracking-[0.22em] text-amber-900/65 font-medium mb-4" id="noteTag">
+                Lembrete para você
+            </p>
 
-    <div id="addModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-5"><div class="bg-[#181d36] border border-white/10 w-full max-w-sm rounded-3xl p-6 text-left shadow-2xl"><h2 class="font-serif-soft text-2xl text-amber-100 mb-1">Novo bilhetinho</h2><p class="text-xs text-slate-400 mb-4">Escreva uma mensagem carinhosa para guardar dentro do pote.</p><textarea id="newNoteInput" rows="4" placeholder="Ex: Lembra daquela vez que a gente riu até perder o ar?" class="w-full rounded-2xl bg-slate-900/70 border border-white/10 p-3.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-200/50 resize-none mb-4"></textarea><div class="flex justify-end gap-2"><button id="btnCancelAdd" class="px-4 py-2 rounded-full text-xs text-slate-400 hover:text-slate-200">Cancelar</button><button id="btnSaveNote" class="px-5 py-2 rounded-full bg-amber-200/90 hover:bg-amber-200 text-slate-900 text-xs font-medium">Colocar no pote</button></div></div></div>
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-800/95 border border-amber-200/20 text-amber-100 text-xs shadow-lg opacity-0 pointer-events-none transition-opacity duration-500">Bilhetinho guardado no pote ✨</div>
+            <!-- Texto da mensagem -->
+            <p id="noteText" class="font-serif-soft text-2xl sm:text-[26px] leading-relaxed text-[#2f2116] font-medium mb-7">
+                Você já fez tudo o que podia até aqui. Agora, o seu único trabalho é descansar.
+            </p>
+
+            <!-- Assinatura delicada -->
+            <p class="text-xs text-amber-950/60 italic mb-6">
+                Com todo o meu amor e orgulho ♥
+            </p>
+
+            <!-- Ações da Carta -->
+            <div class="flex flex-col sm:flex-row gap-2.5 justify-center">
+                <button id="btnAnotherNote" class="px-5 py-2.5 rounded-full bg-[#3a2a1d] hover:bg-[#4d3827] text-amber-50 text-xs font-medium transition-all active:scale-95 shadow-sm">
+                    Pegar outro pergaminho
+                </button>
+                <button id="btnCloseNote" class="px-5 py-2.5 rounded-full bg-amber-900/10 hover:bg-amber-900/15 text-[#3a2a1d] text-xs font-medium transition-all active:scale-95">
+                    Guardar no coração
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: GUIA DE RESPIRAÇÃO SUTIL          -->
+    <!-- ========================================== -->
+    <div id="breatheModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/85 flex flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-xs w-full flex flex-col items-center">
+            <p class="text-xs uppercase tracking-[0.25em] text-indigo-300/70 mb-10">Desacelere um pouquinho</p>
+            
+            <div class="relative w-48 h-48 flex items-center justify-center mb-10">
+                <div class="breathing-circle w-32 h-32 rounded-full border border-amber-200/30 flex items-center justify-center"></div>
+                <span id="breatheInstruction" class="absolute font-serif-soft text-2xl text-amber-100 tracking-wide transition-opacity duration-500">
+                    Inspire...
+                </span>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed mb-8">
+                Acompanhe o círculo. Solte os ombros, destrave o maxilar e deixe o ar sair devagar.
+            </p>
+
+            <button id="btnCloseBreathe" class="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-xs text-slate-200 transition-all">
+                Voltar para o pote
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 3: ADICIONAR NOVO BILHETE            -->
+    <!-- ========================================== -->
+    <div id="addModal" class="note-modal-backdrop fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-5">
+        <div class="bg-[#181d36] border border-white/10 w-full max-w-sm rounded-3xl p-6 text-left shadow-2xl">
+            <h2 class="font-serif-soft text-2xl text-amber-100 mb-1">Novo bilhetinho</h2>
+            <p class="text-xs text-slate-400 mb-4">Escreva uma mensagem carinhosa para guardar dentro do pote.</p>
+            
+            <textarea id="newNoteInput" rows="4" placeholder="Ex: Lembra daquela vez que a gente riu até perder o ar? Amanhã vai ser só mais um dia incrível..." class="w-full rounded-2xl bg-slate-900/70 border border-white/10 p-3.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-200/50 resize-none mb-4"></textarea>
+            
+            <div class="flex justify-end gap-2">
+                <button id="btnCancelAdd" class="px-4 py-2 rounded-full text-xs text-slate-400 hover:text-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button id="btnSaveNote" class="px-5 py-2 rounded-full bg-amber-200/90 hover:bg-amber-200 text-slate-900 text-xs font-medium transition-all active:scale-95">
+                    Colocar no pote
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de feedback suave -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-800/95 border border-amber-200/20 text-amber-100 text-xs shadow-lg opacity-0 pointer-events-none transition-opacity duration-500">
+        Bilhetinho guardado no pote ✨
+    </div>
 
     <script>
-        const defaultMessages=[
-          {tag:"Meu amor por você",text:"Sempre que você precisar lembrar o quanto é amada: você me faz a pessoa mais feliz do mundo inteiro só por existir na minha vida."},
-          {tag:"Para a vida toda",text:"Eu quero que você saiba que você é a pessoa com quem eu quero passar todos os dias da minha vida, dividindo cada conquista e cada risada."},
-          {tag:"Seus sonhos",text:"Nunca desista dos seus sonhos, meu amor. Eles são gigantes e lindos, exatamente como o seu coração. Você é capaz de alcançar qualquer coisa."},
-          {tag:"Quero estar junto",text:"Eu quero fazer parte de todos os seus sonhos, estar do seu lado em cada vitória e caminhar de mãos dadas com você em cada etapa do futuro."},
-          {tag:"Descanso merecido",text:"Você já se dedicou tanto até aqui. Hoje à noite, o seu único trabalho é descansar a cabeça, fechar os olhos e dormir tranquila."},
-          {tag:"Orgulho gigante",text:"Eu admiro demais a sua força, a sua garra e a mulher incrível que você é. Tenho um orgulho absurdo de você todos os dias."},
-          {tag:"Respire fundo",text:"Solta os ombros agora, respira bem devagar... Você não precisa carregar o mundo nas costas hoje. Eu tô aqui segurando a sua mão."},
-          {tag:"Nosso futuro",text:"Eu mal posso esperar por tudo o que ainda vamos viver juntos. Cada plano, cada viagem e cada domingo preguiçoso ao seu lado."},
-          {tag:"Para o seu coração",text:"Se o sono demorar um pouquinho, não brigue com ele. Só fecha os olhos, imagina a gente abraçado e deixa o corpo relaxar."},
-          {tag:"Carinho noturno",text:"Mesmo se eu não estiver aí do seu lado agora, fecha os olhos e sente meu abraço bem apertado. Eu te amo mais do que tudo."},
-          {tag:"Você me inspira",text:"Você me inspira todos os dias a ser uma pessoa melhor, sabia? O jeito que você luta pelo que quer é uma das coisas que eu mais amo em você."},
-          {tag:"Acalme a mente",text:"Está tudo bem desacelerar agora. O mundo pode esperar até amanhã. Agora é hora de cuidar de você e descansar."},
-          {tag:"Meu lugar favorito",text:"Independente de qualquer coisa, o meu lugar favorito no mundo inteiro continua sendo ao seu lado. Dorme bem, meu bem."}
+        // ==========================================
+        // 1. LISTA DE MENSAGENS CARINHOSAS & ROMÂNTICAS
+        // ==========================================
+        const defaultMessages = [
+            { tag: "Meu amor por você", text: "Sempre que você precisar lembrar o quanto é amada: você me faz a pessoa mais feliz do mundo inteiro só por existir na minha vida." },
+            { tag: "Para a vida toda", text: "Eu quero que você saiba que você é a pessoa com quem eu quero passar todos os dias da minha vida, dividindo cada conquista e cada risada." },
+            { tag: "Seus sonhos", text: "Nunca desista dos seus sonhos, meu amor. Eles são gigantes e lindos, exatamente como o seu coração. Você é capaz de alcançar qualquer coisa." },
+            { tag: "Quero estar junto", text: "Eu quero fazer parte de todos os seus sonhos, estar do seu lado em cada vitória e caminhar de mãos dadas com você em cada etapa do futuro." },
+            { tag: "Descanso merecido", text: "Você já se dedicou tanto até aqui. Hoje à noite, o seu único trabalho é descansar a cabeça, fechar os olhos e dormir tranquila." },
+            { tag: "Orgulho gigante", text: "Eu admiro demais a sua força, a sua garra e a mulher incrível que você é. Tenho um orgulho absurdo de você todos os dias." },
+            { tag: "Respire fundo", text: "Solta os ombros agora, respira bem devagar... Você não precisa carregar o mundo nas costas hoje. Eu tô aqui segurando a sua mão." },
+            { tag: "Nosso futuro", text: "Eu mal posso esperar por tudo o que ainda vamos viver juntos. Cada plano, cada viagem e cada domingo preguiçoso ao seu lado." },
+            { tag: "Para o seu coração", text: "Se o sono demorar um pouquinho, não brigue com ele. Só fecha os olhos, imagina a gente abraçado e deixa o corpo relaxar." },
+            { tag: "Carinho noturno", text: "Mesmo se eu não estiver aí do seu lado agora, fecha os olhos e sente meu abraço bem apertado. Eu te amo mais do que tudo." },
+            { tag: "Você me inspira", text: "Você me inspira todos os dias a ser uma pessoa melhor, sabia? O jeito que você luta pelo que quer é uma das coisas que eu mais amo em você." },
+            { tag: "Acalme a mente", text: "Está tudo bem desacelerar agora. O mundo pode esperar até amanhã. Agora é hora de cuidar de você e descansar." },
+            { tag: "Meu lugar favorito", text: "Independente de qualquer coisa, o meu lugar favorito no mundo inteiro continua sendo ao seu lado. Dorme bem, meu bem." }
         ];
-        let messages=[];try{const saved=localStorage.getItem('pote_mensagens_lista');messages=saved?JSON.parse(saved):[...defaultMessages]}catch(e){messages=[...defaultMessages]}let unseenIndices=[],lastShownIndex=-1,openedCount=0;try{openedCount=parseInt(localStorage.getItem('pote_mensagens_contador')||'0',10)}catch(e){openedCount=0}
-        function refillBag(){unseenIndices=messages.map((_,idx)=>idx);for(let i=unseenIndices.length-1;i>0;i--){const j=Math.floor(Math.random*(i+1));[unseenIndices[i],unseenIndices[j]]=[unseenIndices[j],unseenIndices[i]]}if(unseenIndices.length>1&&unseenIndices[0]===lastShownIndex){const first=unseenIndices.shift();unseenIndices.push(first)}}
-        function getNextMessage(){if(unseenIndices.length===0)refillBag();const idx=unseenIndices.shift();lastShownIndex=idx;return messages[idx]}
-        function createStarfield(){const c=document.getElementById('starfield'),count=innerWidth<640?45:75;for(let i=0;i<count;i++){const s=document.createElement('div');s.className='star';const z=Math.random()*2.2+.8;s.style.width=z+'px';s.style.height=z+'px';s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*100)+'%';s.style.setProperty('--duration',(Math.random()*4+3.5)+'s');s.style.setProperty('--delay',(Math.random()*5)+'s');c.appendChild(s)}}
-        let audioCtx=null,isAudioEnabled=false,ambientInterval=null;
-        function initAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;audioCtx=new C()}if(audioCtx.state==='suspended')audioCtx.resume()}
-        function playChime(freq,duration=2.5,volume=.04){if(!isAudioEnabled)return;try{initAudio();const now=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(freq,now);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(volume,now+.08);g.gain.exponentialRampToValueAtTime(.0001,now+duration);o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+duration+.1)}catch(e){}}
-        function toggleAmbientAudio(){isAudioEnabled=!isAudioEnabled;const off=document.getElementById('iconAudioOff'),on=document.getElementById('iconAudioOn'),label=document.getElementById('audioLabel');if(isAudioEnabled){initAudio();off.classList.add('hidden');on.classList.remove('hidden');label.textContent='Som ligado';const notes=[261.63,293.66,329.63,392,440,523.25];playChime(392,3.5,.03);ambientInterval=setInterval(()=>playChime(notes[Math.floor(Math.random()*notes.length)],4,.025),3200)}else{off.classList.remove('hidden');on.classList.add('hidden');label.textContent='Som suave';clearInterval(ambientInterval)}}
-        const noteModal=document.getElementById('noteModal'),noteText=document.getElementById('noteText'),noteTag=document.getElementById('noteTag'),counterText=document.getElementById('counterText');
-        function updateCounter(){if(openedCount>0){counterText.innerHTML=`Você já abriu <span class="text-amber-200/90 font-medium">${openedCount}</span> ${openedCount===1?'motivo':'motivos'} pelos quais eu tenho orgulho de você.`}}
-        function openNote(){const msg=getNextMessage();if(noteModal.classList.contains('active')){noteText.style.opacity='0';noteTag.style.opacity='0';setTimeout(()=>{noteTag.textContent=msg.tag;noteText.textContent=msg.text;noteText.style.opacity='1';noteTag.style.opacity='1'},220)}else{noteTag.textContent=msg.tag;noteText.textContent=msg.text;noteModal.classList.add('active')}openedCount++;try{localStorage.setItem('pote_mensagens_contador',openedCount.toString())}catch(e){}updateCounter()}
-        function closeNote(){noteModal.classList.remove('active')}
-        const breatheModal=document.getElementById('breatheModal'),breatheInstruction=document.getElementById('breatheInstruction');let breatheTimer=null;
-        function startBreathing(){breatheModal.classList.add('active');const step=()=>{breatheInstruction.textContent='Inspire...';setTimeout(()=>breatheModal.classList.contains('active')&&(breatheInstruction.textContent='Segure...'),4000);setTimeout(()=>breatheModal.classList.contains('active')&&(breatheInstruction.textContent='Expire devagar...'),5500)};step();breatheTimer=setInterval(step,10000)}
-        function stopBreathing(){breatheModal.classList.remove('active');clearInterval(breatheTimer)}
-        const addModal=document.getElementById('addModal'),newNoteInput=document.getElementById('newNoteInput'),toast=document.getElementById('toast');
-        function showToast(text){toast.textContent=text;toast.style.opacity='1';setTimeout(()=>toast.style.opacity='0',2600)}
-        function saveNewNote(){const val=newNoteInput.value.trim();if(!val)return;messages.push({tag:'Bilhetinho especial',text:val});try{localStorage.setItem('pote_mensagens_lista',JSON.stringify(messages))}catch(e){}unseenIndices.unshift(messages.length-1);newNoteInput.value='';addModal.classList.remove('active');showToast('Bilhetinho guardado no pote ✨')}
-        window.addEventListener('DOMContentLoaded',()=>{createStarfield();refillBag();updateCounter();noteText.style.transition='opacity .25s ease';noteTag.style.transition='opacity .25s ease';document.getElementById('jarTrigger').addEventListener('click',openNote);document.getElementById('btnOpenNote').addEventListener('click',openNote);document.getElementById('btnAnotherNote').addEventListener('click',openNote);document.getElementById('btnCloseNote').addEventListener('click',closeNote);noteModal.addEventListener('click',e=>e.target===noteModal&&closeNote());document.getElementById('btnAudio').addEventListener('click',toggleAmbientAudio);document.getElementById('btnBreathe').addEventListener('click',startBreathing);document.getElementById('btnCloseBreathe').addEventListener('click',stopBreathing);document.getElementById('btnOpenAdd').addEventListener('click',()=>{addModal.classList.add('active');setTimeout(()=>newNoteInput.focus(),150)});document.getElementById('btnCancelAdd').addEventListener('click',()=>addModal.classList.remove('active'));document.getElementById('btnSaveNote').addEventListener('click',saveNewNote);addModal.addEventListener('click',e=>e.target===addModal&&addModal.classList.remove('active'))});
-    <\/script>
+
+        // Carrega mensagens salvas localmente (caso você ou ela adicionem novas)
+        let messages = [];
+        try {
+            const saved = localStorage.getItem('pote_mensagens_lista');
+            messages = saved ? JSON.parse(saved) : [...defaultMessages];
+        } catch (e) {
+            messages = [...defaultMessages];
+        }
+
+        // Controle para não repetir mensagens imediatamente
+        let unseenIndices = [];
+        let lastShownIndex = -1;
+        let openedCount = 0;
+
+        try {
+            openedCount = parseInt(localStorage.getItem('pote_mensagens_contador') || '0', 10);
+        } catch (e) {
+            openedCount = 0;
+        }
+
+        function refillBag() {
+            unseenIndices = messages.map((_, idx) => idx);
+            // Embaralha (Fisher-Yates)
+            for (let i = unseenIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unseenIndices[i], unseenIndices[j]] = [unseenIndices[j], unseenIndices[i]];
+            }
+            // Evita que a primeira da nova rodada seja igual à última mostrada
+            if (unseenIndices.length > 1 && unseenIndices[0] === lastShownIndex) {
+                const first = unseenIndices.shift();
+                unseenIndices.push(first);
+            }
+        }
+
+        function getNextMessage() {
+            if (unseenIndices.length === 0) {
+                refillBag();
+            }
+            const nextIdx = unseenIndices.shift();
+            lastShownIndex = nextIdx;
+            return messages[nextIdx];
+        }
+
+        // ==========================================
+        // 2. GERAÇÃO DO CÉU ESTRELADO
+        // ==========================================
+        function createStarfield() {
+            const container = document.getElementById('starfield');
+            const starCount = window.innerWidth < 640 ? 45 : 75;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2.2 + 0.8;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.setProperty('--duration', `${Math.random() * 4 + 3.5}s`);
+                star.style.setProperty('--delay', `${Math.random() * 5}s`);
+                container.appendChild(star);
+            }
+        }
+
+        // ==========================================
+        // 3. ÁUDIO SUAVE (WEB AUDIO API - SEM URLs)
+        // ==========================================
+        let audioCtx = null;
+        let isAudioEnabled = false;
+        let ambientInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Toca uma nota doce de caixa de música / sino suave
+        function playChimeNote(freq, duration = 2.5, volume = 0.04) {
+            if (!isAudioEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(volume, now + 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + duration + 0.1);
+            } catch (e) {
+                // Ignora bloqueios de áudio silenciosamente
+            }
+        }
+
+        // Acorde gentil ao abrir um bilhete
+        function playOpenCardSound() {
+            if (!isAudioEnabled) return;
+            // Pentatônica de Dó maior (muito relaxante)
+            playChimeNote(523.25, 2.2, 0.035); // C5
+            setTimeout(() => playChimeNote(659.25, 2.4, 0.03), 140); // E5
+            setTimeout(() => playChimeNote(783.99, 2.8, 0.025), 280); // G5
+        }
+
+        // Melodia ambiente bem espaçada e baixinha
+        function toggleAmbientAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const iconOff = document.getElementById('iconAudioOff');
+            const iconOn = document.getElementById('iconAudioOn');
+            const label = document.getElementById('audioLabel');
+
+            if (isAudioEnabled) {
+                initAudio();
+                iconOff.classList.add('hidden');
+                iconOn.classList.remove('hidden');
+                label.textContent = 'Som ligado';
+                label.classList.add('text-amber-200');
+
+                const calmNotes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+                playChimeNote(392.00, 3.5, 0.03);
+
+                ambientInterval = setInterval(() => {
+                    if (!isAudioEnabled) return;
+                    const randomNote = calmNotes[Math.floor(Math.random() * calmNotes.length)];
+                    playChimeNote(randomNote, 4.0, 0.025);
+                }, 3200);
+            } else {
+                iconOff.classList.remove('hidden');
+                iconOn.classList.add('hidden');
+                label.textContent = 'Som suave';
+                label.classList.remove('text-amber-200');
+                clearInterval(ambientInterval);
+            }
+        }
+
+        // ==========================================
+        // 4. INTERAÇÕES E MODAIS
+        // ==========================================
+        const noteModal = document.getElementById('noteModal');
+        const noteText = document.getElementById('noteText');
+        const noteTag = document.getElementById('noteTag');
+        const counterText = document.getElementById('counterText');
+
+        function updateCounterUI() {
+            if (openedCount > 0) {
+                const word = openedCount === 1 ? 'motivo' : 'motivos';
+                counterText.innerHTML = `Você já abriu <span class="text-amber-200/90 font-medium">${openedCount}</span> ${word} pelos quais eu tenho orgulho de você.`;
+            }
+        }
+
+        function openNote() {
+            const msg = getNextMessage();
+            
+            // Efeito suave de transição de texto se o modal já estiver aberto
+            if (noteModal.classList.contains('active')) {
+                noteText.style.opacity = '0';
+                noteTag.style.opacity = '0';
+                setTimeout(() => {
+                    noteTag.textContent = msg.tag;
+                    noteText.textContent = msg.text;
+                    noteText.style.opacity = '1';
+                    noteTag.style.opacity = '1';
+                }, 220);
+            } else {
+                noteTag.textContent = msg.tag;
+                noteText.textContent = msg.text;
+                noteModal.classList.add('active');
+            }
+
+            playOpenCardSound();
+
+            openedCount++;
+            try {
+                localStorage.setItem('pote_mensagens_contador', openedCount.toString());
+            } catch (e) {}
+            updateCounterUI();
+        }
+
+        function closeNote() {
+            noteModal.classList.remove('active');
+        }
+
+        // Guia de respiração sincronizado com a animação CSS (10s ciclo)
+        const breatheModal = document.getElementById('breatheModal');
+        const breatheInstruction = document.getElementById('breatheInstruction');
+        let breatheTimer = null;
+
+        function startBreatheCycle() {
+            breatheModal.classList.add('active');
+            const runStep = () => {
+                breatheInstruction.textContent = 'Inspire...';
+                setTimeout(() => {
+                    if (breatheModal.classList.contains('active')) {
+                        breatheInstruction.textContent = 'Segure...';
+                    }
+                }, 4000);
+                setTimeout(() => {
+                    if (breatheModal.classList.contains('active')) {
+                        breatheInstruction.textContent = 'Expire devagar...';
+                    }
+                }, 5500);
+            };
+            runStep();
+            breatheTimer = setInterval(runStep, 10000);
+        }
+
+        function stopBreatheCycle() {
+            breatheModal.classList.remove('active');
+            clearInterval(breatheTimer);
+        }
+
+        // Adicionar novo bilhetinho
+        const addModal = document.getElementById('addModal');
+        const newNoteInput = document.getElementById('newNoteInput');
+        const toast = document.getElementById('toast');
+
+        function showToast(text) {
+            toast.textContent = text;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2600);
+        }
+
+        function saveNewNote() {
+            const val = newNoteInput.value.trim();
+            if (!val) return;
+
+            messages.push({
+                tag: "Bilhetinho especial",
+                text: val
+            });
+
+            try {
+                localStorage.setItem('pote_mensagens_lista', JSON.stringify(messages));
+            } catch (e) {}
+
+            // Garante que o novo bilhete apareça logo
+            unseenIndices.unshift(messages.length - 1);
+
+            newNoteInput.value = '';
+            addModal.classList.remove('active');
+            showToast('Bilhetinho guardado no pote ✨');
+        }
+
+        // ==========================================
+        // 5. EVENT LISTENERS E INICIALIZAÇÃO
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            createStarfield();
+            refillBag();
+            updateCounterUI();
+
+            noteText.style.transition = 'opacity 0.25s ease';
+            noteTag.style.transition = 'opacity 0.25s ease';
+
+            // Abrir bilhete pelo pote ou pelo botão
+            document.getElementById('jarTrigger').addEventListener('click', openNote);
+            document.getElementById('btnOpenNote').addEventListener('click', openNote);
+            document.getElementById('btnAnotherNote').addEventListener('click', openNote);
+            document.getElementById('btnCloseNote').addEventListener('click', closeNote);
+
+            // Fechar modal clicando fora do cartão
+            noteModal.addEventListener('click', (e) => {
+                if (e.target === noteModal) closeNote();
+            });
+
+            // Áudio
+            document.getElementById('btnAudio').addEventListener('click', toggleAmbientAudio);
+
+            // Respiração
+            document.getElementById('btnBreathe').addEventListener('click', startBreatheCycle);
+            document.getElementById('btnCloseBreathe').addEventListener('click', stopBreatheCycle);
+
+            // Adicionar bilhete
+            document.getElementById('btnOpenAdd').addEventListener('click', () => {
+                addModal.classList.add('active');
+                setTimeout(() => newNoteInput.focus(), 150);
+            });
+            document.getElementById('btnCancelAdd').addEventListener('click', () => {
+                addModal.classList.remove('active');
+            });
+            document.getElementById('btnSaveNote').addEventListener('click', saveNewNote);
+            addModal.addEventListener('click', (e) => {
+                if (e.target === addModal) addModal.classList.remove('active');
+            });
+        });
+    </script>
 </body>
 </html>
